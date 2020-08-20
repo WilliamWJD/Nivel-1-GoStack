@@ -1,10 +1,32 @@
 const express = require('express');
-const { uuid } = require('uuidv4');
+const { uuid, isUuid } = require('uuidv4');
 
 const server = express();
 server.use(express.json());
 
 const projects = [];
+
+function logRequest(req,res,next){
+  const {method, url} = req;
+  const logLabel = `[${method.toUpperCase()}] ${url}`;
+
+  console.time(logLabel)
+  next();
+  console.timeEnd(logLabel);
+}
+
+function validateProjectId(req,res,next){
+  const { id } = req.params;
+
+  if(!isUuid(id)){
+    return res.status(400).json({error:'Invalid project id'})
+  }
+
+  return next();
+}
+
+server.use(logRequest)
+server.use('/projects/:id',validateProjectId)
 
 server.get('/projects', (req, res) => {
   const { title } = req.query;
@@ -62,5 +84,5 @@ server.delete('/projects/:id', (req, res) => {
 const port = 3333;
 
 server.listen(port, () => {
-  console.log(`Servidor online na porta ${port}`);
+  console.log(`✔ Servidor online na porta ${port}`);
 });
