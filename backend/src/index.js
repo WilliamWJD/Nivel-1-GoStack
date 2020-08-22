@@ -1,8 +1,10 @@
 const express = require('express');
+const cors =  require ('cors');
 const { uuid, isUuid } = require('uuidv4');
 
 const server = express();
 server.use(express.json());
+server.use(cors());
 
 const projects = [];
 
@@ -27,6 +29,7 @@ function validateProjectId(req,res,next){
 
 server.use(logRequest)
 server.use('/projects/:id',validateProjectId)
+
 
 server.get('/projects', (req, res) => {
   const { title } = req.query;
